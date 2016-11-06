@@ -5,14 +5,8 @@ screeps_username:
 screeps_password:
 screeps_ptr: false
 
-# Your Account SID from www.twilio.com/console
-twilio_sid:
+# Your Account APK Key
+nma_api_key:
 
-# Your Auth Token from www.twilio.com/console
-twilio_token:
-
-# You SMS number from twilio. https://www.twilio.com/console/phone-numbers/dashboard
-sms_from: '+15555555555'
-
-# This should be the number you want to receive the texts.
-sms_to: '+15555555555'
+# Your Application Name (can be anything)
+nma_application: Screeps

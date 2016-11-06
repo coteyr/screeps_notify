@@ -1,6 +1,7 @@
 
-var Notify = function (message, limit) {
+var Notify = function (subject, description="", priority=0, url="http://screeps.com", limit=0) {
 
+  let message = {subject: subject, description: description, priority: priority, url: url}
   // If no limit then send immediately (and potentially repeatedly)
   if(!limit) {
     Notify.queueMessage(message)

@@ -4,10 +4,13 @@ import requests
 from screeps import ScreepsConnection
 import sys
 import time
-from twilio.rest import TwilioRestClient
 import logging
 import os
 import yaml
+import requests
+import json
+
+
 
 base_directory = os.path.expanduser('~')
 if not os.path.exists(base_directory):
@@ -55,53 +58,17 @@ def clearNotifications(tick=0):
     sconn.console(javascript_clear)
 
 
-def sendSMS(notification):
-    message = 'Screeps: ' + notification['message']
-    settings = getSettings()
+def sendNMA(notification):
+      # notification = json.loads(notification)
+      subject = notification['message']['subject']
+      description = notification['message']['description']
+      priority = notification['message']['priority']
+      url = notification['message']['url']
 
-    if 'twilio_sid' not in settings:
-        print('skipping sms due to lack of settings.')
-        return
-
-    smsclient = TwilioRestClient(settings['twilio_sid'],
-                                 settings['twilio_token'])
-    message = smsclient.messages.create(
-        body=message,
-        to=settings['sms_to'],    # Replace with your phone number
-        from_=settings['sms_from'])  # Replace with your Twilio number
-    print(message.sid)
-
-
-def sendHTTP(notification):
-    settings = getSettings()
-
-    if 'http' not in settings:
-        print('skipping http due to lack of settings.')
-        return
-
-    notification['user'] = settings['screeps_username']
-    headers = {
-        'user-agent': 'screeps_notify',
-    }
-
-    if 'api-key' in settings:
-        headers['x-api-key'] = settings['api-key']
-
-    print headers
-    if 'http_user' in settings:
-        r = requests.post(settings['http'],
-                          json=notification,
-                          headers=headers,
-                          auth=(settings['http_user'],
-                                settings['http_password']))
-    else:
-        r = requests.post(settings['http'],
-                          json=notification,
-                          headers=headers)
-
-        print r.text
-        print r.status_code
-        return r.status_code == requests.codes.ok
+      settings = getSettings()
+      post_data = {'application': settings['nma_application'], 'apikey': settings['nma_api_key'], 'event': subject, 'description': description, 'priority': priority, 'url': url}
+      post_response = requests.post(url='https://www.notifymyandroid.com/publicapi/notify', data=post_data)
+      print(post_response.text)
 
 
 class App():
@@ -134,8 +101,8 @@ class App():
             for notification in notifications:
                 if notification['tick'] > limit:
                     limit = notification['tick']
-                sendSMS(notification)
-                sendHTTP(notification)
+                sendNMA(notification)
+                # sendHTTP(notification)
             clearNotifications(limit)
             time.sleep(5)
 
